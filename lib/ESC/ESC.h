@@ -32,5 +32,6 @@ public:
   int getPulseWidth();
 
   void setPower(int percent);
+  void setPower(int (*percent)(int currentPower));
   int getPower();
 };
