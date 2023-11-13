@@ -8,15 +8,13 @@ ESC esc;
 void setup()
 {
   esc.attach(ESC_PIN);
-
-  // 10% power
-  esc.setPower(10);
 }
 
 void loop()
 {
   int power = esc.getPower();
 
+  // 10% power
   if (power < 10)
   {
     esc.setPower(power + 1);
