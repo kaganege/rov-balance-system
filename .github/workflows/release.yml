@@ -15,9 +15,9 @@ jobs:
       - uses: actions/cache@v3
         with:
           path: |
-            ~\.cache\pip
-            ~\.platformio\.cache
-            .\build
+            ~/.cache/pip
+            ~/.platformio/.cache
+            ~/${{ github.repository }}/.pio
           key: ${{ runner.os }}-pio
       - uses: actions/setup-python@v4
         with:
@@ -25,17 +25,22 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Enable Long Paths
-        run: git config --system core.longpaths true
-
       - name: Build Project
         run: |
+          if (Test-Path ~\${{ github.repository }}\.pio -PathType Container) {
+            Get-Item ~\${{ github.repository }}\.pio | Move-Item -Destination .\pio\
+          }
+
           .\build.ps1
+          ls build
+
+      - name: Cache PIO
+        run: Copy-Item -Path .pio\ -Destination ~/${{ github.repository }}/.pio
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            .\build\firmware.bin
-            .\build\firmware.elf
-            .\build\firmware.uf2
+            build/firmware.bin
+            build/firmware.elf
+            build/firmware.uf2
