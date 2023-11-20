@@ -1,0 +1,37 @@
+name: Release
+permissions:
+  contents: write
+on: [push]
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~\.cache\pip
+            ~\.platformio\.cache
+            .\build
+          key: ${{ runner.os }}-pio
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+      - name: Install PlatformIO Core
+        run: pip install --upgrade platformio
+
+      - name: Build Project
+        run: |
+          .\build.ps1
+          cd .\build
+
+      - name: Release
+        uses: softprops/action-gh-release@v1
+        if: startsWith(github.ref, 'refs/tags/')
+        with:
+          files: |
+            firmware.bin
+            firmware.elf
+            firmware.uf2
