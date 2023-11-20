@@ -1,7 +1,7 @@
-Set-Alias pio "$HOME\.platformio\penv\Scripts\platformio.exe"
+$platformio = "$HOME\.platformio\penv\Scripts\platformio.exe"
 
-if (Test-Path -Path pio -PathType Leaf) {
-  pio run
+if (Test-Path -Path $platformio -PathType Leaf) {
+  & $platformio run
 
   if (Test-Path .\build -PathType Container) {
     Remove-Item .\build\*
