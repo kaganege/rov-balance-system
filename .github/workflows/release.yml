@@ -31,12 +31,11 @@ jobs:
       - name: Build Project
         run: |
           .\build.ps1
-          cd .\build
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
-            firmware.bin
-            firmware.elf
-            firmware.uf2
+            .\build\firmware.bin
+            .\build\firmware.elf
+            .\build\firmware.uf2
