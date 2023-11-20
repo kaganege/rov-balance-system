@@ -25,6 +25,9 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
+      - name: Enable Long Paths
+        run: git config --system core.longpaths true
+
       - name: Build Project
         run: |
           if (Test-Path ~\${{ github.repository }}\.pio -PathType Container) {
