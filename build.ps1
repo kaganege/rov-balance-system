@@ -23,6 +23,6 @@ if ($LASTEXITCODE -eq 0) {
   Get-Item .\.pio\build\rpipicow\firmware.* | Move-Item -Destination .\build\
 }
 else {
-  Write-Host "Platformio exited with $LASTEXITCODE"
+  Write-Host "Platformio exited with $LASTEXITCODE code"
   Exit $LASTEXITCODE
 }
