@@ -12,11 +12,17 @@ if ($null -eq (Get-Command platformio -ErrorAction SilentlyContinue)) {
 
 platformio run
 
-if (Test-Path .\build -PathType Container) {
-  Remove-Item .\build\*
+if ($LASTEXITCODE -eq 0) {
+  if (Test-Path .\build -PathType Container) {
+    Remove-Item .\build\*
+  }
+  else {
+    New-Item build -ItemType Directory
+  }
+  
+  Get-Item .\.pio\build\rpipicow\firmware.* | Move-Item -Destination .\build\
 }
 else {
-  New-Item build -ItemType Directory
+  Write-Host "Platformio exited with $LASTEXITCODE"
+  Exit $LASTEXITCODE
 }
-
-Get-Item .\.pio\build\rpipicow\firmware.* | Move-Item -Destination .\build\
