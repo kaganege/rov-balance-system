@@ -14,6 +14,10 @@ void setup()
 {
   analogReadResolution(12);
 
+  // We are driving high GPIO 23 because forcing the power supply into PWM mode reduces ADC noise. I mean, I hope so. I didn't tested.
+  pinMode(23, OUTPUT);
+  digitalWrite(23, HIGH);
+
   pinMode(POT_PIN, INPUT);
   esc.attach(ESC_PIN);
 
