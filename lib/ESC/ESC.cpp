@@ -86,8 +86,8 @@ int ESC::getPulseWidth()
 
 void ESC::setPower(int percent)
 {
-  percent = max(0, min(percent, 100));
-  int pulse_width = map(percent, 0, 100, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
+  percent = max(0, min(percent, 1000));
+  int pulse_width = map(percent, 0, 1000, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH);
 
   setPulseWidth(pulse_width);
 }
@@ -99,5 +99,5 @@ void ESC::setPower(int (*percent)(int currentPower))
 
 int ESC::getPower()
 {
-  return map(_pulse_width, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH, 0, 100);
+  return map(_pulse_width, MIN_PULSE_WIDTH, MAX_PULSE_WIDTH, 0, 1000);
 }
