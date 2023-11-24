@@ -2,7 +2,7 @@
 #include <ESC.h>
 
 #define ESC_PIN 2
-#define POT_PIN 31
+#define POT_PIN 26
 
 // min pulse width 1160
 
@@ -12,18 +12,20 @@ bool wait_for_zero = true;
 
 void setup()
 {
+  analogReadResolution(12);
+
+  pinMode(POT_PIN, INPUT);
   esc.attach(ESC_PIN);
 
   Serial.begin();
-  while (!Serial)
-    ;
-
-  Serial.println("Current power: 0%");
 }
 
 void loop()
 {
   int pot_value = analogRead(POT_PIN);
+  pot_value = map(max(pot_value, 20), 20, 4096, 0, 1000);
+
+  Serial.printf("Potentiometer value: %d\n", pot_value);
 
   if (wait_for_zero)
   {
@@ -33,7 +35,7 @@ void loop()
     return;
   }
 
-  power = map(pot_value, 0, 4096, 0, 1000);
+  power = pot_value;
 
   if (esc.getPower() != power)
   {
