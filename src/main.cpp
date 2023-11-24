@@ -2,11 +2,13 @@
 #include <ESC.h>
 
 #define ESC_PIN 2
+#define POT_PIN 31
 
 // min pulse width 1160
 
 ESC esc;
-void setPower(int power);
+int power = 0;
+bool wait_for_zero = true;
 
 void setup()
 {
@@ -21,26 +23,22 @@ void setup()
 
 void loop()
 {
-  if (Serial.available())
-  {
-    const int data = Serial.readStringUntil('\n').toInt();
+  int pot_value = analogRead(POT_PIN);
 
-    setPower(data);
+  if (wait_for_zero)
+  {
+    if (pot_value == 0)
+      wait_for_zero = false;
+
+    return;
   }
-}
 
-void setPower(int power)
-{
-  int currentPower = esc.getPower();
-  bool positive = currentPower < power;
+  power = map(pot_value, 0, 4096, 0, 1000);
 
-  for (int i = currentPower; positive ? i < power : i > power; positive ? i++ : i--)
+  if (esc.getPower() != power)
   {
-    int p = positive ? i + 1 : i - 1;
-
-    Serial.printf("Current power: %d%\n", p);
-    esc.setPower(p);
-
-    delay(50);
+    esc.setPower([](int currentPower)
+                 { return currentPower < power ? currentPower + 1 : currentPower - 1; });
+    delayMicroseconds(500);
   }
 }
