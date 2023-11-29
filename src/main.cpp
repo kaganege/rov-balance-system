@@ -1,6 +1,8 @@
 #include <Arduino.h>
 #include <ESC.h>
 
+#define FIT(value, _min, _max) min(max(value, _min), _max)
+
 #define ESC_PIN 2
 #define POT_PIN 26
 
@@ -8,18 +10,25 @@
 
 ESC esc;
 int power = 0;
+int pot_min, pot_max;
 bool wait_for_zero = true;
+
+// template <typename T>
+// T fit(T value, T _min, T _max)
+// {
+//   return min(max(value, _min), _max);
+// }
 
 void setup()
 {
-  analogReadResolution(12);
+  analogReadResolution(12); // 12 bit (0 - 4096)
 
-  // We are driving high GPIO 23 because forcing the power supply into PWM mode reduces ADC noise. I mean, I hope so. I didn't tested.
+  // We are driving high GPIO 23 because forcing the power supply into PWM mode reduces ADC noise.
   pinMode(23, OUTPUT);
   digitalWrite(23, HIGH);
 
   pinMode(POT_PIN, INPUT);
-  esc.attach(ESC_PIN);
+  // esc.attach(ESC_PIN);
 
   Serial.begin();
 }
@@ -27,24 +36,43 @@ void setup()
 void loop()
 {
   int pot_value = analogRead(POT_PIN);
-  pot_value = map(max(pot_value, 20), 20, 4096, 0, 1000);
 
+  if (!pot_min && BOOTSEL)
+  {
+    pot_min = pot_value + 10;
+
+    while (BOOTSEL)
+      ;
+  }
+  else if (!pot_max && BOOTSEL)
+  {
+    pot_max = pot_value - 10;
+
+    while (BOOTSEL)
+      ;
+  }
+  else if (pot_min && pot_max)
+  {
+    pot_value = map(FIT(pot_value, pot_min, pot_max), pot_min, pot_max, 0, 1000);
+
+    if (wait_for_zero)
+    {
+      if (pot_value == 0)
+        wait_for_zero = false;
+    }
+    else
+    {
+      power = pot_value;
+
+      if (esc.getPower() != power)
+      {
+        esc.setPower([](int currentPower)
+                     { return currentPower < power ? currentPower + 1 : currentPower - 1; });
+        delay(1);
+      }
+    }
+  }
   Serial.printf("Potentiometer value: %d\n", pot_value);
 
-  if (wait_for_zero)
-  {
-    if (pot_value == 0)
-      wait_for_zero = false;
-
-    return;
-  }
-
-  power = pot_value;
-
-  if (esc.getPower() != power)
-  {
-    esc.setPower([](int currentPower)
-                 { return currentPower < power ? currentPower + 1 : currentPower - 1; });
-    delayMicroseconds(500);
-  }
+  delayMicroseconds(500);
 }
