@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <ESC.h>
+#include <Gyro.h>
 
 #define ESC_PIN 2
 #define POT_PIN 26
@@ -7,6 +8,7 @@
 // min pulse width 1160
 
 ESC esc;
+Gyro gyro = Gyro();
 int power = 0;
 bool wait_for_zero = true;
 
@@ -21,6 +23,9 @@ void setup()
 
   pinMode(POT_PIN, INPUT);
   esc.attach(ESC_PIN);
+  gyro.init();
+
+  // gyro.waitUntilConnect();
 
   Serial.begin();
 }
@@ -44,7 +49,6 @@ void loop()
   {
     esc.setPower([](int currentPower)
                  { return currentPower < power ? currentPower + 1 : currentPower - 1; });
-    // delayMicroseconds(500);
   }
 
   delay(1);
