@@ -17,7 +17,6 @@ jobs:
           path: |
             ~/.cache/pip
             ~/.platformio/.cache
-            ~/${{ github.repository }}/.pio
           key: ${{ runner.os }}-pio
       - uses: actions/setup-python@v4
         with:
@@ -30,15 +29,8 @@ jobs:
 
       - name: Build Project
         run: |
-          if (Test-Path ~\${{ github.repository }}\.pio -PathType Container) {
-            Get-Item ~\${{ github.repository }}\.pio | Move-Item -Destination .\pio\
-          }
-
           .\build.ps1
           ls build
-
-      - name: Cache PIO
-        run: Copy-Item -Path .pio\ -Destination ~/${{ github.repository }}/.pio
 
       - name: Release
         uses: softprops/action-gh-release@v1
