@@ -17,7 +17,6 @@ ESC esc;
 Gyro gyro;
 
 int power = 0;
-// int pot_min, pot_max;
 bool wait_for_zero = true;
 
 void setup()
@@ -40,23 +39,7 @@ void loop()
     rp2040.rebootToBootloader();
   }
 
-  int pot_value = analogRead(POT_PIN);
-
-  // if (!pot_min && BOOTSEL)
-  // {
-  //   pot_min = pot_value + 10;
-
-  //   while (BOOTSEL)
-  //     ;
-  // }
-  // else if (!pot_max && BOOTSEL)
-  // {
-  //   pot_max = pot_value - 10;
-
-  //   while (BOOTSEL)
-  //     ;
-  // }
-  pot_value = FIT(pot_value, POT_MIN, POT_MAX);
+  int pot_value = FIT(analogRead(POT_PIN), POT_MIN, POT_MAX);
 
   if (wait_for_zero)
   {
