@@ -37,6 +37,7 @@ void loop()
   if (BOOTSEL)
   {
     rp2040.rebootToBootloader();
+    return;
   }
 
   int pot_value = FIT(analogRead(POT_PIN), POT_MIN, POT_MAX);
