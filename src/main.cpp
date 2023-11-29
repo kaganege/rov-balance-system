@@ -15,8 +15,9 @@ void setup()
   analogReadResolution(12);
 
   // We are driving high GPIO 23 because forcing the power supply into PWM mode reduces ADC noise. I mean, I hope so. I didn't tested.
-  pinMode(23, OUTPUT);
-  digitalWrite(23, HIGH);
+  // pinMode(23, OUTPUT);
+  // digitalWrite(23, HIGH);
+  // Does not work :(
 
   pinMode(POT_PIN, INPUT);
   esc.attach(ESC_PIN);
@@ -27,24 +28,24 @@ void setup()
 void loop()
 {
   int pot_value = analogRead(POT_PIN);
-  pot_value = map(max(pot_value, 20), 20, 4096, 0, 1000);
+  power = map(min(max(pot_value, 50), 4090), 50, 4090, 0, 1000);
 
-  Serial.printf("Potentiometer value: %d\n", pot_value);
+  Serial.printf("Potentiometer value: %d, Motor power: %d\n", pot_value, power);
 
   if (wait_for_zero)
   {
-    if (pot_value == 0)
+    if (power == 0)
       wait_for_zero = false;
 
     return;
   }
 
-  power = pot_value;
-
   if (esc.getPower() != power)
   {
     esc.setPower([](int currentPower)
                  { return currentPower < power ? currentPower + 1 : currentPower - 1; });
-    delayMicroseconds(500);
+    // delayMicroseconds(500);
   }
+
+  delay(1);
 }
