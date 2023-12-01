@@ -1,6 +1,5 @@
 #include <Arduino.h>
 #include <ESC.h>
-#include <Gyro.h>
 
 #define FIT(value, _min, _max) min(max(value, _min), _max)
 #define OR(condition, default) condition ? condition : default
@@ -14,7 +13,6 @@
 // min pulse width 1160
 
 ESC esc;
-Gyro gyro;
 
 int power = 0;
 bool wait_for_zero = true;
@@ -27,9 +25,6 @@ void setup()
   Serial.begin();
 
   esc.attach(ESC_PIN);
-  gyro.init();
-
-  gyro.waitUntilConnect();
 }
 
 void loop()
