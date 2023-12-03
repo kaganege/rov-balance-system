@@ -4,7 +4,7 @@ permissions:
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "v[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
   deploy:
@@ -35,6 +35,7 @@ jobs:
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
+          prerelease: ${{ endsWith(github.ref, 'nightly') || endsWith(github.ref, 'beta') }}
           files: |
             build/firmware.bin
             build/firmware.elf
