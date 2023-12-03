@@ -32,10 +32,19 @@ jobs:
           .\build.ps1
           ls build
 
+      - name: Get Previous Version
+        id: previous_tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          prefix: v
+          fallback: v1.0.0
+
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
-          prerelease: ${{ endsWith(github.ref, 'nightly') || endsWith(github.ref, 'beta') }}
+          prerelease: ${{ endsWith(github.ref_name, 'nightly') || endsWith(github.ref_name, 'beta') }}
+          body: "Change log: ${{ github.server_url }}/${{ github.repository }}/compare/${{ steps.previous_tag.outputs.tag }}...${{ github.ref_name }}"
+          # generate_release_notes: true
           files: |
             build/firmware.bin
             build/firmware.elf
