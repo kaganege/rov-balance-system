@@ -12,10 +12,7 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
-      - run: |
-          $tag = git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/*"
-          echo $tag
+      - uses: actions/checkout@v4
 
       # - uses: actions/cache@v3
       #   with:
@@ -61,7 +58,7 @@ jobs:
         id: previous_tag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
         with:
-          prefix: v${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}
+          prefix: v
           fallback: v1.0.0
 
       - name: Tests
