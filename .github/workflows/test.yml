@@ -39,7 +39,10 @@ jobs:
           }
 
           $Version = "${{ inputs.version }}".Substring(1).Split(".")
-          $PreviousVersion = Get-Previous-Tag v($Version[0]).($Version[1])
+          $VersionWithoutPatch = "v$Version[0].$Version[1]"
+          $PreviousVersion = Get-Previous-Tag $VersionWithoutPatch
+
+          Write-Host $VersionWithoutPatch
           Write-Host $PreviousVersion
 
           Append-Output major $Version[0]
