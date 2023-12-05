@@ -43,7 +43,8 @@ jobs:
             return git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/$Prefix*"
           }
 
-          $PreviousVersion = Get-Previous-Tag v
+          Write-Host git --version
+          $PreviousVersion = Get-Previous-Tag
           Write-Host $PreviousVersion
 
           $Version = "${{ inputs.version }}".Substring(1).Split(".")
