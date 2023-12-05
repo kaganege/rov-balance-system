@@ -4,7 +4,7 @@ on:
     inputs:
       version:
         required: true
-        default: v1.0.0
+        default: v1.1.0
         type: string
 
 jobs:
@@ -31,9 +31,8 @@ jobs:
           Function Append-Output {
             $Key = $Args[0]
             $Value = $Args[1..$Args.Length] -Join " "
-            $GITHUB_OUTPUT = "$GITHUB_OUTPUT$Key=$Value`n"
-
-            Write-Host $Key = $Value
+            
+            Write-Output "$Key=$Value`n" >> $Env:GITHUB_OUTPUT
           }
 
           $Version = "${{ inputs.version }}".Substring(1).Split(".")
