@@ -20,7 +20,7 @@ jobs:
           git fetch --prune --unshallow || true
 
       - name: Parse Versions
-        id: version
+        id: previous_version
         shell: pwsh
         run: |
           Function Append-Output {
@@ -45,16 +45,10 @@ jobs:
           Write-Host $VersionWithoutPatch
           Write-Host $PreviousVersion
 
+          Append-Output version $($Version -Join ".")
           Append-Output major $Version[0]
           Append-Output minor $Version[1]
           Append-Output patch $Version[2]
-
-      - name: Get Previous Version
-        id: previous_tag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        with:
-          prefix: v${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}
-          fallback: v1.0.0
 
       - name: Tests
         shell: pwsh
@@ -64,15 +58,14 @@ jobs:
               [string]$Version
             )
 
-            return $Version.Substring(1).Split(".")
+            if ($Version.StartsWith("v")) {
+              $Version = $Version.Substring(1)
+            }
+
+            return $Version.Split(".")
           }
 
           $CurrentVersion = Parse-Version "${{ inputs.version }}"
-          $PreviousVersion = Parse-Version "${{ steps.previous_tag.outputs.tag }}"
 
           Write-Host Version: ($CurrentVersion -Join ".")
-          Write-Host Previous Version: ($PreviousVersion -Join ".")
-
-          Write-Host Major: ${{ steps.version.outputs.major }}
-          Write-Host Minor: ${{ steps.version.outputs.minor }}
-          Write-Host Patch: ${{ steps.version.outputs.patch }}
+          Write-Host Previous Version: ${{ steps.previous_version.outputs.version }}
