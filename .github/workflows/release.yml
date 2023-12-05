@@ -18,9 +18,11 @@ jobs:
             ~/.cache/pip
             ~/.platformio/.cache
           key: ${{ runner.os }}-pio
+
       - uses: actions/setup-python@v4
         with:
           python-version: "3.9"
+
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
@@ -36,7 +38,7 @@ jobs:
         id: previous_tag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
         with:
-          prefix: v
+          prefix: v${{ github.ref_name[1] }}
           fallback: v1.0.0
 
       - name: Release

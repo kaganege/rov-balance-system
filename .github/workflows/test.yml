@@ -1,0 +1,49 @@
+name: Test
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        required: true
+        default: v1.0.0
+        type: string
+
+jobs:
+  deploy:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/cache@v3
+        with:
+          path: |
+            ~/.cache/pip
+            ~/.platformio/.cache
+          key: ${{ runner.os }}-pio
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: "3.9"
+
+      - name: Get Previous Version
+        id: previous_tag
+        uses: "WyriHaximus/github-action-get-previous-tag@v1"
+        with:
+          prefix: v
+          fallback: v1.0.0
+
+      - name: Tests
+        shell: pwsh
+        run: |
+          Function Parse-Version {
+            param(
+              [string]$Version
+            )
+
+            return $Version.Substring(1).Split(".")
+          }
+
+          $CurrentVersion = Parse-Version "${{ inputs.tag }}"
+          $PreviousVersion = Parse-Version "${{ steps.previous_tag.outputs.tag }}"
+
+          Write-Host Version: ($CurrentVersion -Join ".")
+          Write-Host Previous Version: ($PreviousVersion -Join ".")
