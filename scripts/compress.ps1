@@ -1,3 +1,11 @@
+if (-not (Test-Path ".\platformio.ini" -PathType Leaf) -and (Test-Path "..\platformio.ini" -PathType Leaf)) {
+  Set-Location ..
+}
+else {
+  Write-Host "Project folder can not found!"
+  Exit 1
+}
+
 if (Test-Path .\rov-balance-system.zip -PathType Leaf) {
   Remove-Item .\rov-balance-system.zip
 }

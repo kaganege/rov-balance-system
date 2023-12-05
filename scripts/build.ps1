@@ -1,4 +1,12 @@
-if ($null -eq (Get-Command platformio -ErrorAction SilentlyContinue)) {
+if (-not (Test-Path ".\platformio.ini" -PathType Leaf) -and (Test-Path "..\platformio.ini" -PathType Leaf)) {
+  Set-Location ..
+}
+else {
+  Write-Host "Project folder can not found!"
+  Exit 1
+}
+
+if (-not (Get-Command platformio -ErrorAction SilentlyContinue)) {
   $platformio = "$HOME\.platformio\penv\Scripts\platformio.exe"
 
   if (Test-Path -Path $platformio -PathType Leaf) {
