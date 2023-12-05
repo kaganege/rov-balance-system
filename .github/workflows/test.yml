@@ -24,7 +24,7 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Parse Version
+      - name: Parse Versions
         id: version
         shell: pwsh
         run: |
@@ -34,6 +34,17 @@ jobs:
 
             Write-Output "$Key=$Value`n" >> $Env:GITHUB_OUTPUT
           }
+
+          Function Get-Previous-Tag {
+            param(
+              [string]Prefix = ""
+            )
+
+            return git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/$Prefix*"
+          }
+
+          $PreviousVersion = Get-Previous-Tag v
+          Write-Host $PreviousVersion
 
           $Version = "${{ inputs.version }}".Substring(1).Split(".")
 
@@ -45,7 +56,7 @@ jobs:
         id: previous_tag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
         with:
-          prefix: (v${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }})
+          prefix: v${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}
           fallback: v1.0.0
 
       - name: Tests
