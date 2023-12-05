@@ -31,7 +31,7 @@ jobs:
           Function Append-Output {
             $Key = $Args[0]
             $Value = $Args[1..$Args.Length] -Join " "
-            
+
             Write-Output "$Key=$Value`n" >> $Env:GITHUB_OUTPUT
           }
 
@@ -66,3 +66,5 @@ jobs:
           Write-Host Previous Version: ($PreviousVersion -Join ".")
 
           Write-Host Major: ${{ steps.version.outputs.major }}
+          Write-Host Minor: ${{ steps.version.outputs.minor }}
+          Write-Host Patch: ${{ steps.version.outputs.patch }}
