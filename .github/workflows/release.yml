@@ -11,13 +11,21 @@ jobs:
     runs-on: windows-latest
 
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: actions/cache@v3
         with:
           path: |
             ~/.cache/pip
             ~/.platformio/.cache
           key: ${{ runner.os }}-pio
+
+      - name: Fetch Tags
+        run: |
+          git fetch --tags
+          git fetch --prune --unshallow || true
+
+      - name: Enable Long Paths
+        run: git config --system core.longpaths true
 
       - uses: actions/setup-python@v4
         with:
@@ -26,26 +34,58 @@ jobs:
       - name: Install PlatformIO Core
         run: pip install --upgrade platformio
 
-      - name: Enable Long Paths
-        run: git config --system core.longpaths true
-
       - name: Build Project
+        shell: pwsh
         run: |
-          .\build.ps1
+          & .\scripts\build.ps1
           ls build
 
-      - name: Get Previous Version
-        id: previous_tag
-        uses: "WyriHaximus/github-action-get-previous-tag@v1"
-        with:
-          prefix: v${{ github.ref_name[1] }}
-          fallback: v1.0.0
+      - name: Get Previous Patch
+        id: previous_patch
+        run: |
+          Function Append-Output {
+            $Key = $Args[0]
+            $Value = $Args[1..$Args.Length] -Join " "
+
+            Write-Output "$Key=$Value`n" >> $Env:GITHUB_OUTPUT
+          }
+
+          Function Get-Tag {
+            param(
+              [string]$Prefix = ""
+            )
+
+            return git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/$Prefix*"
+          }
+
+          Function Parse-Version {
+            param(
+              [string]$Version
+            )
+
+            return $Version.Substring(1).Split(".")
+          }
+
+          $CurrentVersion = Parse-Version ${{ github.ref_name }}
+          $CurrentVersionWithoutPatch = "v$($CurrentVersion[0]).$($CurrentVersion[1])"
+
+          $Version = Parse-Version $(Get-Tag $CurrentVersionWithoutPatch)
+
+          # If there are not any patch version use previous version
+          if ([string]::IsNullOrEmpty($Version)) {
+            $Version = Parse-Version $(Get-Tag v)
+          }
+
+          Append-Output version $($Version -Join ".")
+          Append-Output major $Version[0]
+          Append-Output minor $Version[1]
+          Append-Output patch $Version[2]
 
       - name: Release
         uses: softprops/action-gh-release@v1
         with:
           prerelease: ${{ endsWith(github.ref_name, 'nightly') || endsWith(github.ref_name, 'beta') }}
-          body: "Change log: ${{ github.server_url }}/${{ github.repository }}/compare/${{ steps.previous_tag.outputs.tag }}...${{ github.ref_name }}"
+          body: "Change log: ${{ github.server_url }}/${{ github.repository }}/compare/v${{ steps.previous_patch.outputs.version }}...${{ github.ref_name }}"
           # generate_release_notes: true
           files: |
             build/firmware.bin
