@@ -13,16 +13,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/cache@v3
-        with:
-          path: |
-            ~/.cache/pip
-            ~/.platformio/.cache
-          key: ${{ runner.os }}-pio
+      # - uses: actions/cache@v3
+      #   with:
+      #     path: |
+      #       ~/.cache/pip
+      #       ~/.platformio/.cache
+      #     key: ${{ runner.os }}-pio
 
-      - uses: actions/setup-python@v4
-        with:
-          python-version: "3.9"
+      # - uses: actions/setup-python@v4
+      #   with:
+      #     python-version: "3.9"
 
       - name: Parse Versions
         id: version
@@ -43,7 +43,7 @@ jobs:
             return git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/$Prefix*"
           }
 
-          Write-Host git --version
+          Write-Host $(git --version)
           $PreviousVersion = Get-Previous-Tag
           Write-Host $PreviousVersion
 
