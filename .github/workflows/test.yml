@@ -30,10 +30,10 @@ jobs:
               [string]$Prefix = ""
             )
 
-            return git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/*"
+            return (git tag -l --sort=-creatordate)[0]
+            # return git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/*"
           }
 
-          Write-Host $(git ls-files)
           $PreviousVersion = Get-Previous-Tag v
           Write-Host $PreviousVersion
 
