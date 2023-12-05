@@ -2,13 +2,13 @@ name: Test
 on:
   workflow_dispatch:
     inputs:
-      tag:
+      version:
         required: true
         default: v1.0.0
         type: string
 
 jobs:
-  deploy:
+  test:
     runs-on: windows-latest
 
     steps:
@@ -24,11 +24,27 @@ jobs:
         with:
           python-version: "3.9"
 
+      - name: Parse Version
+        id: version
+        shell: pwsh
+        run: |
+          Function Append-Output {
+            $Key = Args[0]
+            $Value = Args[1..$Args.Length] -Join " "
+            $GITHUB_OUTPUT = "$GITHUB_OUTPUT$Key=$Value`n"
+          }
+
+          $Version = "${{ inputs.version }}".Substring(1).Split(".")
+
+          Append-Output major $Version[0]
+          Append-Output minor $Version[1]
+          Append-Output patch $Version[2]
+
       - name: Get Previous Version
         id: previous_tag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
         with:
-          prefix: v
+          prefix: v${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}
           fallback: v1.0.0
 
       - name: Tests
@@ -42,8 +58,10 @@ jobs:
             return $Version.Substring(1).Split(".")
           }
 
-          $CurrentVersion = Parse-Version "${{ inputs.tag }}"
+          $CurrentVersion = Parse-Version "${{ inputs.version }}"
           $PreviousVersion = Parse-Version "${{ steps.previous_tag.outputs.tag }}"
 
           Write-Host Version: ($CurrentVersion -Join ".")
           Write-Host Previous Version: ($PreviousVersion -Join ".")
+
+          Write-Host Major: ${{ steps.version.outputs.major }}
