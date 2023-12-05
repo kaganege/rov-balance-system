@@ -14,6 +14,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Fetch Tags
+        run: |
+          git fetch --tags
+          git fetch --prune --unshallow || true
+
       - name: Parse Versions
         id: version
         shell: pwsh
@@ -33,13 +38,9 @@ jobs:
             return git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/$Prefix*"
           }
 
-          git fetch --tags
-          git fetch --prune --unshallow || true
-
-          $PreviousVersion = Get-Previous-Tag v
-          Write-Host $PreviousVersion
-
           $Version = "${{ inputs.version }}".Substring(1).Split(".")
+          $PreviousVersion = Get-Previous-Tag v($Version[0]).($Version[1])
+          Write-Host $PreviousVersion
 
           Append-Output major $Version[0]
           Append-Output minor $Version[1]
@@ -49,7 +50,7 @@ jobs:
         id: previous_tag
         uses: "WyriHaximus/github-action-get-previous-tag@v1"
         with:
-          prefix: v
+          prefix: v${{ steps.version.outputs.major }}.${{ steps.version.outputs.minor }}
           fallback: v1.0.0
 
       - name: Tests
