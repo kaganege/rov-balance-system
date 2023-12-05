@@ -13,6 +13,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+      - run: |
+          $tag = git for-each-ref --sort=-creatordate --count 1 --format="%(refname:short)" "refs/tags/*"
+          echo $tag
+
       # - uses: actions/cache@v3
       #   with:
       #     path: |
