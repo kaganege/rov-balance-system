@@ -29,8 +29,8 @@ jobs:
         shell: pwsh
         run: |
           Function Append-Output {
-            $Key = Args[0]
-            $Value = Args[1..$Args.Length] -Join " "
+            $Key = $Args[0]
+            $Value = $Args[1..$Args.Length] -Join " "
             $GITHUB_OUTPUT = "$GITHUB_OUTPUT$Key=$Value`n"
           }
 
