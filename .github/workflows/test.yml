@@ -32,6 +32,8 @@ jobs:
             $Key = $Args[0]
             $Value = $Args[1..$Args.Length] -Join " "
             $GITHUB_OUTPUT = "$GITHUB_OUTPUT$Key=$Value`n"
+
+            Write-Host $Key = $Value
           }
 
           $Version = "${{ inputs.version }}".Substring(1).Split(".")
