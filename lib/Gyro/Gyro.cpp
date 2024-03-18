@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <Gyro.h>
 #include <Wire.h>
 #include <math.h>

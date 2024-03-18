@@ -18,7 +18,7 @@ if ($Path) {
   Exit 0
 }
 else {
-  Write-Host "Please specify the upload path"
+  Write-Host "Please specify the upload disk/path"
   
   Exit 1
 }

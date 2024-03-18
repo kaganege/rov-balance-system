@@ -1,6 +1,7 @@
-#include <Arduino.h>
 #include <KalmanFilter.h>
 #include <MPU6050.h>
+
+// TODO: Change for ICM42688-P
 
 enum Motions
 {
